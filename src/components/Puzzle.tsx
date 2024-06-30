@@ -3,7 +3,7 @@ import Tile from "./Tile";
 import Overlay from "./Overlay";
 
 // Ändra antal brickor i matrisen här
-const MATRIX: number = 2;
+const MATRIX: number = 4;
 
 // Rätt state
 const SolvedState = Array.from(
