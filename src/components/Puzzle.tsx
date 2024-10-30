@@ -2,16 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 import Tile from "./Tile";
 import Overlay from "./Overlay";
 
-// Ändra antal brickor i matrisen här
 const MATRIX: number = 4;
 
-// Rätt state
 const SolvedState = Array.from(
   { length: MATRIX * MATRIX - 1 },
   (_, i) => i + 1
 ).concat([0]);
 
-const Puzzle: React.FC = () => {
+function Puzzle() {
   const [tiles, setTiles] = useState<number[]>([]);
   const [emptyIndex, setEmptyIndex] = useState<number>(MATRIX * MATRIX - 1);
   const [moves, setMoves] = useState<number>(0);
@@ -21,7 +19,7 @@ const Puzzle: React.FC = () => {
   const [currentPhrase, setCurrentPhrase] = useState<number>(0);
   const [isSolved, setIsSolved] = useState<boolean>(false);
 
-  // Fisher-Yates algoritm för att shuffla rutorna
+  // Fisher-Yates algoritm
   const shuffleTiles = useCallback((tiles: number[]) => {
     if (!tiles.length) return;
     for (let i = tiles.length - 1; i > 0; i--) {
@@ -37,51 +35,37 @@ const Puzzle: React.FC = () => {
     shuffleTiles(initialTiles);
   }, [shuffleTiles]);
 
-  // Funktion som tar en index parameter - dvs den bricka som klickas på i brick-arrayen
-  const handleTileClick = (index: number) => {
-    // Räknar ut radnumret där den tomma brickan ligger
+  function handleTileClick(index: number) {
     const emptyRow = Math.floor(emptyIndex / MATRIX);
 
-    // Räknar ut kolumnnumret där den tomma brickan ligger
     const emptyCol = emptyIndex % MATRIX;
 
-    // Räknar ut radnumret där den klickade brickan ligger
     const tileRow = Math.floor(index / MATRIX);
 
-    // Räknar ut kolumnnumret där den klickade brickan ligger
     const tileCol = index % MATRIX;
 
-    // Kollar om den klickade brickan är i samma rad eller kolumn som den tomma brickan
     if (emptyRow === tileRow || emptyCol === tileCol) {
-      // Skapa en ny array för att ändra brickorna för att undvika mutation
       const newTiles = [...tiles];
 
-      // Kollar om den tomma brickan och den klickade brickan är i samma rad
       if (emptyRow === tileRow) {
-        // Flytta tiles i samma rad
         if (emptyCol < tileCol) {
-          // Flytta tiles till vänster om tomma brickan är till vänster om den klickade brickan
           for (let i = emptyCol; i < tileCol; i++) {
             newTiles[i + emptyRow * MATRIX] =
               newTiles[i + 1 + emptyRow * MATRIX];
           }
         } else {
-          // Flytta tiles till höger om tomma brickan är till höger om den klickade brickan
           for (let i = emptyCol; i > tileCol; i--) {
             newTiles[i + emptyRow * MATRIX] =
               newTiles[i - 1 + emptyRow * MATRIX];
           }
         }
       } else {
-        // Flytta brickorna i samma kolumn
         if (emptyRow < tileRow) {
-          // Flytta brickorna uppåt om tomma brickan är ovanför den klickade brickan
           for (let i = emptyRow; i < tileRow; i++) {
             newTiles[emptyCol + i * MATRIX] =
               newTiles[emptyCol + (i + 1) * MATRIX];
           }
         } else {
-          // Flytta brickorna nedåt om tomma brickan är under den klickade brickan
           for (let i = emptyRow; i > tileRow; i--) {
             newTiles[emptyCol + i * MATRIX] =
               newTiles[emptyCol + (i - 1) * MATRIX];
@@ -89,34 +73,24 @@ const Puzzle: React.FC = () => {
         }
       }
 
-      // Sätt den nya tomma brickpositionen
       newTiles[index] = 0;
-
-      // Uppdatera state med den nya brick-arrayen
       setTiles(newTiles);
-
-      // Uppdatera indexet för den tomma brickan
       setEmptyIndex(index);
-
-      // Öka move-counter
       setMoves((prevMoves) => prevMoves + 1);
     }
-  };
+  }
 
-  //rätt state
   const solvedTiles = Array.from(
     { length: MATRIX * MATRIX - 1 },
     (_, i) => i + 1
   ).concat([0]);
 
-  // Kolla om pusslet är löst
   const checkIsSolved = useCallback(() => {
     const solved = tiles.every((tile, index) => tile === SolvedState[index]);
     setIsSolved(solved);
     return solved;
   }, [tiles, solvedTiles]);
 
-  // Om spelet är löst - uppdatera highscore
   useEffect(() => {
     if (checkIsSolved()) {
       console.log("Moves:", moves, "Highscore:", highscore);
@@ -127,8 +101,7 @@ const Puzzle: React.FC = () => {
     }
   }, [isSolved, moves, highscore]);
 
-  // switch-funktion för att visa meddelande beroende på hur många poäng
-  const getMessageByScore = (score: number) => {
+  function getMessageByScore(score: number) {
     switch (true) {
       case score >= 80 && score <= 100:
         return "Wow you solved it! How did you even do that... Amazing!";
@@ -143,20 +116,17 @@ const Puzzle: React.FC = () => {
       default:
         return "";
     }
-  };
+  }
 
-  // Funktion för att stänga overlayen när spel är klarat
-  const closeOverlay = () => {
+  function closeOverlay() {
     setIsSolved(false);
-  };
+  }
 
-  // Funktion för att resetta spelet
-  const resetGame = () => {
+  function resetGame() {
     setMoves(0);
     shuffleTiles(tiles);
-  };
+  }
 
-  // En animation just for fun :)
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
@@ -177,11 +147,11 @@ const Puzzle: React.FC = () => {
           setCurrentText((prev) =>
             phrases[currentPhrase].substring(0, prev.length + 1)
           );
-        }, 40); // hastighet
+        }, 40);
       } else {
         timer = setTimeout(() => {
           setAnimationPhase("erasing");
-        }, 4000); //vänta 4 sek innan radera
+        }, 4000);
       }
     }
 
@@ -269,6 +239,6 @@ const Puzzle: React.FC = () => {
       )}
     </div>
   );
-};
+}
 
 export default Puzzle;

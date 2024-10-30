@@ -1,10 +1,12 @@
-interface TileProps {
+function Tile({
+  index,
+  value,
+  onClick,
+}: {
   index: number;
   value: number;
   onClick: () => void;
-}
-
-const Tile: React.FC<TileProps> = ({ index, value, onClick }) => {
+}) {
   return (
     <div
       className={`flex items-center justify-center border-2 text-xl font-semibold h-16 w-16 md:h-24 md:w-24 rounded-lg transition-transform duration-150 ${
@@ -19,6 +21,6 @@ const Tile: React.FC<TileProps> = ({ index, value, onClick }) => {
       {value !== 0 ? value : ""}
     </div>
   );
-};
+}
 
 export default Tile;
